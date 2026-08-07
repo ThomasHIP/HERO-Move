@@ -10,163 +10,57 @@
 :root{--pnav:#071a36;--porange:#ff8618;--pgreen:#1f9d69}
 body{background:#eef3f8}
 .present-shell{max-width:1180px;margin:0 auto;padding:24px 18px 120px}
-.present-card{min-height:72vh;background:#fff;border:1px solid var(--line);border-radius:30px;padding:clamp(28px,5vw,64px);margin:18px 0;display:grid;align-content:center;box-shadow:0 18px 50px rgba(7,26,54,.08);scroll-margin-top:88px}
+.present-card{min-height:72vh;background:#fff;border:1px solid var(--line);border-radius:30px;padding:clamp(28px,5vw,64px);margin:18px 0;display:grid;align-content:center;box-shadow:0 18px 50px rgba(7,26,54,.08);scroll-margin-top:88px;overflow:hidden}
 .present-card.dark{background:linear-gradient(145deg,#071a36,#14355f);color:#fff;border-color:#173a69}
-.present-card.dark h1,.present-card.dark h2,.present-card.dark h3{color:#fff}
-.present-card.dark p{color:#c8d4e5}
+.present-card.dark h1,.present-card.dark h2,.present-card.dark h3{color:#fff}.present-card.dark p{color:#c8d4e5}
 .present-card.soft{background:#edf5f2}
 .present-card h1{font-size:clamp(3rem,7vw,6.5rem);line-height:.95;letter-spacing:-.055em;margin:.2em 0;color:var(--navy)}
 .present-card h2{font-size:clamp(2.2rem,5vw,4.8rem);line-height:1;letter-spacing:-.045em;margin:.2em 0 .35em;color:var(--navy)}
 .present-card h3{color:var(--navy)}
 .present-card p{font-size:clamp(1rem,1.8vw,1.22rem);line-height:1.7;color:var(--muted);max-width:850px}
-.present-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
-.present-grid.two{grid-template-columns:repeat(2,1fr)}
-.present-tile{border:1px solid var(--line);background:#fff;border-radius:20px;padding:22px}
-.dark .present-tile{background:#ffffff0b;border-color:#ffffff20}
+.present-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}.present-grid.two{grid-template-columns:repeat(2,1fr)}
+.present-tile{border:1px solid var(--line);background:#fff;border-radius:20px;padding:22px}.dark .present-tile{background:#ffffff0b;border-color:#ffffff20}
 .present-number{font-size:2.4rem;font-weight:900;color:var(--porange)}
 .present-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
 .present-nav{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:80;background:rgba(7,26,54,.96);color:#fff;border:1px solid #ffffff24;border-radius:18px;padding:8px;display:flex;gap:6px;box-shadow:0 16px 40px #0004;max-width:calc(100vw - 24px);overflow:auto}
-.present-nav a,.present-nav button{white-space:nowrap;border:0;border-radius:12px;padding:10px 13px;background:transparent;color:#fff;text-decoration:none;font-weight:800;cursor:pointer}
-.present-nav .primary{background:var(--porange);color:#172238}
-.storyline{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:28px}
-.storyline div{background:#f4f7fa;border:1px solid var(--line);border-radius:15px;padding:14px;text-align:center;font-size:.82rem;font-weight:800}
-.dark .storyline div{background:#ffffff0b;border-color:#ffffff1b}
-.esg-badge{display:inline-flex;gap:8px;align-items:center;background:#e6f5ee;color:#17684b;border-radius:999px;padding:9px 13px;font-weight:850;margin-bottom:12px}
-.quote{font-size:clamp(2rem,5vw,4.4rem);line-height:1.05;letter-spacing:-.045em;color:var(--navy);max-width:980px}
-@media(max-width:820px){.present-grid,.present-grid.two{grid-template-columns:1fr}.storyline{grid-template-columns:1fr 1fr}.present-card{min-height:auto}.present-nav{left:12px;right:12px;transform:none}}
+.present-nav a,.present-nav button{white-space:nowrap;border:0;border-radius:12px;padding:10px 13px;background:transparent;color:#fff;text-decoration:none;font-weight:800;cursor:pointer}.present-nav .primary{background:var(--porange);color:#172238}
+.storyline{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:28px}.storyline div{background:#f4f7fa;border:1px solid var(--line);border-radius:15px;padding:14px;text-align:center;font-size:.82rem;font-weight:800}.dark .storyline div{background:#ffffff0b;border-color:#ffffff1b}
+.esg-badge{display:inline-flex;gap:8px;align-items:center;background:#e6f5ee;color:#17684b;border-radius:999px;padding:9px 13px;font-weight:850;margin-bottom:12px}.quote{font-size:clamp(2rem,5vw,4.4rem);line-height:1.05;letter-spacing:-.045em;color:var(--navy);max-width:980px}
+.visual-split{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}.visual-frame{border-radius:26px;overflow:hidden;border:1px solid #dbe4ef;background:linear-gradient(145deg,#f7fafc,#e7eef6);min-height:330px;display:grid;place-items:center}.dark .visual-frame{border-color:#ffffff22;background:linear-gradient(145deg,#0e284c,#173b68)}
+.scene{width:100%;height:auto;display:block}.scene text{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.dark .scene .softtext{fill:#c8d4e5}.dark .scene .maintext{fill:#fff}
+.logo-chip{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-weight:850;color:var(--navy)}
+@media(max-width:820px){.present-grid,.present-grid.two,.visual-split{grid-template-columns:1fr}.storyline{grid-template-columns:1fr 1fr}.present-card{min-height:auto}.present-nav{left:12px;right:12px;transform:none}.visual-frame{min-height:250px}}
 </style>
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="index.html"><span class="brand-mark">HM</span><strong>HERO <em>Move</em></strong></a>
-  <nav class="desktop-nav"><a href="index.html">Home</a><a href="portals.html">Portals</a><a href="presentation.html">Presentation</a></nav>
-  <div class="top-actions"><a class="btn btn-primary small-btn" href="booking.html">Try Live Demo</a></div>
-</header>
-
+<header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">HM</span><strong>HERO <em>Move</em></strong></a><nav class="desktop-nav"><a href="index.html">Home</a><a href="portals.html">Portals</a><a href="presentation.html">Presentation</a></nav><div class="top-actions"><a class="btn btn-primary small-btn" href="booking.html">Try Live Demo</a></div></header>
 <main class="present-shell">
-<section class="present-card dark" id="p1">
-  <span class="eyebrow">HERO MOVE</span>
-  <h1>Smart Mobility.<br>One Connected Platform.</h1>
-  <p>Advance booking, fleet operations, driver management, corporate tax profiles, HERO PAY readiness, HERO Credits and EV / ESG reporting — built for modern transportation operators.</p>
-  <div class="present-actions"><a class="btn btn-primary" href="booking.html">Try Live Booking</a><a class="btn btn-outline" href="#p2">Start Presentation</a></div>
-</section>
 
-<section class="present-card" id="p2">
-  <span class="eyebrow">THE CHALLENGE</span>
-  <h2>Transport operators still manage too much by phone, chat and spreadsheets.</h2>
-  <div class="present-grid">
-    <div class="present-tile"><div class="present-number">01</div><h3>Booking</h3><p>Manual reservations, repeated customer information and fragmented confirmations.</p></div>
-    <div class="present-tile"><div class="present-number">02</div><h3>Operations</h3><p>Vehicles, drivers, maintenance and dispatch are often managed separately.</p></div>
-    <div class="present-tile"><div class="present-number">03</div><h3>Corporate Service</h3><p>Tax invoice details and ESG information have to be prepared repeatedly.</p></div>
-  </div>
-</section>
+<section class="present-card dark" id="p1"><div class="visual-split"><div><span class="eyebrow">HERO MOVE</span><h1>Smart Mobility.<br>One Connected Platform.</h1><p>Advance booking, fleet operations, driver management, corporate tax profiles, HERO PAY readiness, HERO Credits and EV / ESG reporting — built for modern transportation operators.</p><div class="present-actions"><a class="btn btn-primary" href="booking.html">Try Live Booking</a><a class="btn btn-outline" href="#p2">Start Presentation</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="Executive electric vehicle with chauffeur and passenger"><rect width="600" height="430" rx="28" fill="#0f2d53"/><circle cx="478" cy="90" r="64" fill="#ff86181f"/><path d="M0 330 C150 275 345 350 600 280 L600 430 L0 430Z" fill="#173d68"/><rect x="110" y="238" width="360" height="88" rx="32" fill="#f8fafc"/><path d="M178 238 L232 182 H370 L430 238Z" fill="#dce8f3"/><rect x="246" y="192" width="98" height="43" rx="10" fill="#91abc2"/><circle cx="190" cy="327" r="38" fill="#142235"/><circle cx="406" cy="327" r="38" fill="#142235"/><circle cx="190" cy="327" r="17" fill="#b8c5d2"/><circle cx="406" cy="327" r="17" fill="#b8c5d2"/><text x="290" y="285" text-anchor="middle" font-size="24" font-weight="800" fill="#071a36">EXECUTIVE EV</text><circle cx="92" cy="177" r="24" fill="#ffb36d"/><rect x="72" y="202" width="44" height="82" rx="18" fill="#f4f7fa"/><circle cx="510" cy="173" r="24" fill="#ffb36d"/><rect x="486" y="198" width="48" height="88" rx="18" fill="#ff8618"/><text x="300" y="84" text-anchor="middle" font-size="34" font-weight="900" fill="#fff">HERO Move</text><text x="300" y="120" text-anchor="middle" font-size="18" fill="#c8d4e5">Advance • Premium • Connected</text></svg></div></div></section>
 
-<section class="present-card soft" id="p3">
-  <span class="eyebrow">THE SOLUTION</span>
-  <h2>HERO Move connects the complete journey.</h2>
-  <div class="storyline">
-    <div>Book</div><div>Member / Guest</div><div>Deposit</div><div>Assign</div><div>Ride</div><div>Balance</div><div>Invoice + ESG</div>
-  </div>
-  <div class="present-actions"><a class="btn btn-primary" href="booking.html">Try Booking Flow</a><a class="btn btn-outline" href="dispatch.html">Try Dispatch</a></div>
-</section>
+<section class="present-card" id="p2"><div class="visual-split"><div><span class="eyebrow">THE CHALLENGE</span><h2>Many transport operators still rely on Phone, LINE and Excel.</h2><p>Bookings, drivers, vehicles, payments and customer information often sit across disconnected tools, creating repetitive work and avoidable mistakes.</p><div class="present-grid"><div class="present-tile"><h3>📞 Phone</h3><p>Calls, handwritten notes and repeated confirmations.</p></div><div class="present-tile"><h3>💬 LINE</h3><p>Bookings and driver coordination scattered across chat threads.</p></div><div class="present-tile"><h3>📊 Excel</h3><p>Schedules, fleet lists and reports updated manually.</p></div></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="Phone, LINE chat and Excel workflow"><rect width="600" height="430" rx="28" fill="#f8fafc"/><rect x="55" y="95" width="145" height="245" rx="28" fill="#071a36"/><rect x="71" y="121" width="113" height="176" rx="12" fill="#fff"/><circle cx="128" cy="318" r="9" fill="#66758a"/><path d="M91 153 C95 135 117 135 124 153 C130 171 104 188 103 188 C103 188 79 169 91 153Z" fill="#ff8618"/><text x="128" y="225" text-anchor="middle" font-size="18" font-weight="800" fill="#071a36">PHONE</text><rect x="236" y="78" width="150" height="110" rx="22" fill="#06c755"/><path d="M275 188 l-13 28 35-22" fill="#06c755"/><text x="311" y="143" text-anchor="middle" font-size="32" font-weight="900" fill="#fff">LINE</text><rect x="225" y="235" width="290" height="128" rx="18" fill="#fff" stroke="#d9e3ed" stroke-width="3"/><rect x="225" y="235" width="290" height="34" rx="18" fill="#1f9d69"/><text x="245" y="258" font-size="18" font-weight="900" fill="#fff">EXCEL</text><g stroke="#dfe6ee"><line x1="245" y1="287" x2="495" y2="287"/><line x1="245" y1="315" x2="495" y2="315"/><line x1="245" y1="343" x2="495" y2="343"/><line x1="310" y1="270" x2="310" y2="350"/><line x1="390" y1="270" x2="390" y2="350"/></g><text x="300" y="53" text-anchor="middle" font-size="24" font-weight="850" fill="#071a36">Disconnected tools. One business.</text></svg></div></div></section>
 
-<section class="present-card dark" id="p4">
-  <span class="eyebrow">WHITE-LABEL ENTERPRISE</span>
-  <h2>Your brand. Your fleet. Your customers.</h2>
-  <p>Designed for chauffeur and car-rental-with-driver companies that operate their own fleet. HERO Move supplies the technology while the operator keeps its own brand, pricing, vehicles, drivers and customer relationships.</p>
-  <div class="present-grid two">
-    <div class="present-tile"><h3>Customer Side</h3><p>Booking, membership, HERO Credits, corporate profile, payment-ready flow and trip history.</p></div>
-    <div class="present-tile"><h3>Operator Side</h3><p>Fleet, drivers, maintenance, calendar, dispatch, pricing, invoices, ESG and settings.</p></div>
-  </div>
-</section>
+<section class="present-card soft" id="p3"><div class="visual-split"><div><span class="eyebrow">THE SOLUTION</span><h2>HERO Move connects the complete journey.</h2><div class="storyline"><div>Book</div><div>Member / Guest</div><div>Deposit</div><div>Assign</div><div>Ride</div><div>Balance</div><div>Invoice + ESG</div></div><div class="present-actions"><a class="btn btn-primary" href="booking.html">Try Booking Flow</a><a class="btn btn-outline" href="dispatch.html">Try Dispatch</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="Connected booking to trip workflow"><rect width="600" height="430" rx="28" fill="#eef6f2"/><g fill="#fff" stroke="#c8ddd2" stroke-width="2"><rect x="55" y="72" width="130" height="78" rx="16"/><rect x="235" y="72" width="130" height="78" rx="16"/><rect x="415" y="72" width="130" height="78" rx="16"/><rect x="145" y="250" width="130" height="78" rx="16"/><rect x="325" y="250" width="130" height="78" rx="16"/></g><g fill="#071a36" font-size="17" font-weight="800" text-anchor="middle"><text x="120" y="118">BOOKING</text><text x="300" y="118">HERO PAY</text><text x="480" y="118">DISPATCH</text><text x="210" y="296">RIDE</text><text x="390" y="296">ESG + INVOICE</text></g><g stroke="#ff8618" stroke-width="5" fill="none" stroke-linecap="round"><path d="M185 111 H235"/><path d="M365 111 H415"/><path d="M480 150 C480 205 390 205 390 250"/><path d="M325 289 H275"/></g><g fill="#ff8618"><circle cx="210" cy="111" r="7"/><circle cx="390" cy="111" r="7"/><circle cx="480" cy="200" r="7"/><circle cx="300" cy="289" r="7"/></g><text x="300" y="390" text-anchor="middle" font-size="28" font-weight="900" fill="#17684b">ONE CONNECTED PLATFORM</text></svg></div></div></section>
 
-<section class="present-card" id="p5">
-  <span class="eyebrow">ROLE-BASED EXPERIENCES</span>
-  <h2>Each user sees only what they need.</h2>
-  <div class="present-grid">
-    <div class="present-tile"><h3>Customer</h3><p>Book, join, earn credits, view trips and tax-invoice details.</p><a href="customer-portal.html">Open Customer Portal →</a></div>
-    <div class="present-tile"><h3>Driver</h3><p>See assigned work, start and finish trips, record operational information.</p><a href="driver-portal.html">Open Driver Portal →</a></div>
-    <div class="present-tile"><h3>Fleet Operator</h3><p>Control bookings, vehicles, drivers, maintenance, performance and dispatch.</p><a href="admin.html">Open Operator Portal →</a></div>
-  </div>
-  <div class="present-actions"><a class="btn btn-navy" href="portals.html">View All Portals</a></div>
-</section>
+<section class="present-card dark" id="p4"><div class="visual-split"><div><span class="eyebrow">WHITE-LABEL ENTERPRISE</span><h2>Your brand. Your fleet. Your customers.</h2><p>Designed for chauffeur and car-rental-with-driver companies that operate their own fleet. HERO Move supplies the technology while the operator keeps its own brand, pricing, vehicles, drivers and customer relationships.</p><div class="present-grid two"><div class="present-tile"><h3>Customer Side</h3><p>Booking, membership, HERO Credits, corporate profile, payment-ready flow and trip history.</p></div><div class="present-tile"><h3>Operator Side</h3><p>Fleet, drivers, maintenance, calendar, dispatch, pricing, invoices, ESG and settings.</p></div></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="White-label operator platform"><rect width="600" height="430" rx="28" fill="#0d2a50"/><rect x="84" y="62" width="432" height="290" rx="22" fill="#f8fafc"/><rect x="84" y="62" width="432" height="54" rx="22" fill="#ff8618"/><circle cx="122" cy="89" r="16" fill="#fff"/><text x="150" y="96" font-size="22" font-weight="900" fill="#172238">YOUR BRAND</text><rect x="116" y="145" width="168" height="76" rx="14" fill="#e9eff7"/><rect x="316" y="145" width="168" height="76" rx="14" fill="#e9eff7"/><rect x="116" y="246" width="368" height="74" rx="14" fill="#eef6f2"/><text x="200" y="189" text-anchor="middle" font-size="20" font-weight="800" fill="#071a36">YOUR FLEET</text><text x="400" y="189" text-anchor="middle" font-size="20" font-weight="800" fill="#071a36">YOUR DRIVERS</text><text x="300" y="290" text-anchor="middle" font-size="22" font-weight="900" fill="#17684b">Powered by HERO Move</text><text x="300" y="389" text-anchor="middle" font-size="18" fill="#c8d4e5">One engine. Different operator brands.</text></svg></div></div></section>
 
-<section class="present-card" id="p6">
-  <span class="eyebrow">FLEET INTELLIGENCE</span>
-  <h2>Every vehicle becomes a permanent operational profile.</h2>
-  <div class="present-grid">
-    <div class="present-tile"><h3>Vehicle Lifecycle</h3><p>Registration, energy type, mileage, insurance, road tax and document expiry.</p></div>
-    <div class="present-tile"><h3>Performance</h3><p>Trips, utilization, revenue, operating hours and cost visibility.</p></div>
-    <div class="present-tile"><h3>Maintenance</h3><p>Periodic service, tyres, brakes, EV battery, repairs and upcoming alerts.</p></div>
-  </div>
-  <div class="present-actions"><a class="btn btn-primary" href="fleet.html">Try Fleet Demo</a><a class="btn btn-outline" href="calendar.html">Open Calendar</a></div>
-</section>
+<section class="present-card" id="p5"><span class="eyebrow">ROLE-BASED EXPERIENCES</span><h2>Each user sees only what they need.</h2><div class="present-grid"><div class="present-tile"><h3>👤 Customer</h3><p>Book, join, earn credits, view trips and tax-invoice details.</p><a href="customer-portal.html">Open Customer Portal →</a></div><div class="present-tile"><h3>👨‍✈️ Driver</h3><p>See assigned work, start and finish trips, record operational information.</p><a href="driver-portal.html">Open Driver Portal →</a></div><div class="present-tile"><h3>🏢 Fleet Operator</h3><p>Control bookings, vehicles, drivers, maintenance, performance and dispatch.</p><a href="admin.html">Open Operator Portal →</a></div></div><div class="present-actions"><a class="btn btn-navy" href="portals.html">View All Portals</a></div></section>
 
-<section class="present-card dark" id="p7">
-  <span class="eyebrow">CORPORATE MOBILITY</span>
-  <h2>Register once. Issue tax invoices faster.</h2>
-  <p>Corporate customers save legal company name, 13-digit Tax ID, branch, registered address, billing contact and tax-invoice email once. Future bookings can reuse the profile immediately.</p>
-  <div class="present-actions"><a class="btn btn-primary" href="membership.html">Try Corporate Signup</a><a class="btn btn-outline" href="customers.html">Corporate Profile Demo</a><a class="btn btn-outline" href="invoices.html">Invoice Center</a></div>
-</section>
+<section class="present-card" id="p6"><div class="visual-split"><div><span class="eyebrow">FLEET INTELLIGENCE</span><h2>Every vehicle becomes a permanent operational profile.</h2><div class="present-grid"><div class="present-tile"><h3>Vehicle Lifecycle</h3><p>Registration, energy type, mileage, insurance, road tax and document expiry.</p></div><div class="present-tile"><h3>Performance</h3><p>Trips, utilization, revenue, operating hours and cost visibility.</p></div><div class="present-tile"><h3>Maintenance</h3><p>Periodic service, tyres, brakes, EV battery, repairs and upcoming alerts.</p></div></div><div class="present-actions"><a class="btn btn-primary" href="fleet.html">Try Fleet Demo</a><a class="btn btn-outline" href="calendar.html">Open Calendar</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="Fleet management dashboard"><rect width="600" height="430" rx="28" fill="#f7fafc"/><rect x="50" y="50" width="500" height="330" rx="22" fill="#fff" stroke="#dce5ee"/><rect x="50" y="50" width="500" height="52" rx="22" fill="#071a36"/><text x="78" y="83" font-size="20" font-weight="900" fill="#fff">FLEET DASHBOARD</text><g><rect x="78" y="130" width="130" height="85" rx="15" fill="#eef3f8"/><rect x="235" y="130" width="130" height="85" rx="15" fill="#eef6f2"/><rect x="392" y="130" width="130" height="85" rx="15" fill="#fff1e3"/></g><g fill="#071a36" font-weight="900" text-anchor="middle"><text x="143" y="160" font-size="15">VEHICLES</text><text x="143" y="195" font-size="34">40</text><text x="300" y="160" font-size="15">AVAILABLE</text><text x="300" y="195" font-size="34">28</text><text x="457" y="160" font-size="15">SERVICE DUE</text><text x="457" y="195" font-size="34">3</text></g><rect x="78" y="245" width="444" height="96" rx="15" fill="#f8fafc"/><path d="M110 318 L175 287 L245 304 L315 260 L390 278 L487 238" fill="none" stroke="#ff8618" stroke-width="5"/><g fill="#ff8618"><circle cx="110" cy="318" r="6"/><circle cx="175" cy="287" r="6"/><circle cx="245" cy="304" r="6"/><circle cx="315" cy="260" r="6"/><circle cx="390" cy="278" r="6"/><circle cx="487" cy="238" r="6"/></g></svg></div></div></section>
 
-<section class="present-card" id="p8">
-  <span class="eyebrow">HERO PAY READY</span>
-  <h2>Simple customer payment flow.</h2>
-  <div class="present-grid two">
-    <div class="present-tile"><h3>10% Reservation Deposit</h3><p>Confirm the advance booking with HERO PAY PromptPay QR or Credit / Debit Card.</p></div>
-    <div class="present-tile"><h3>90% Balance</h3><p>Collect the remaining balance before service and retain a clear payment status.</p></div>
-  </div>
-  <div class="present-actions"><a class="btn btn-primary" href="payment.html">Try Payment Screen</a></div>
-</section>
+<section class="present-card dark" id="p7"><div class="visual-split"><div><span class="eyebrow">CORPORATE MOBILITY</span><h2>Register once. Issue tax invoices faster.</h2><p>Corporate customers save legal company name, 13-digit Tax ID, branch, registered address, billing contact and tax-invoice email once. Future bookings can reuse the profile immediately.</p><div class="present-actions"><a class="btn btn-primary" href="membership.html">Try Corporate Signup</a><a class="btn btn-outline" href="customers.html">Corporate Profile Demo</a><a class="btn btn-outline" href="invoices.html">Invoice Center</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="Corporate registration and tax invoice profile"><rect width="600" height="430" rx="28" fill="#0d2a50"/><rect x="88" y="58" width="424" height="314" rx="24" fill="#fff"/><text x="120" y="103" font-size="26" font-weight="900" fill="#071a36">CORPORATE PROFILE</text><rect x="120" y="130" width="310" height="18" rx="9" fill="#e4ebf2"/><rect x="120" y="165" width="220" height="18" rx="9" fill="#e4ebf2"/><rect x="120" y="200" width="350" height="18" rx="9" fill="#e4ebf2"/><rect x="120" y="240" width="140" height="74" rx="14" fill="#eef6f2"/><rect x="280" y="240" width="190" height="74" rx="14" fill="#fff1e3"/><text x="190" y="270" text-anchor="middle" font-size="15" font-weight="800" fill="#17684b">TAX ID</text><text x="190" y="297" text-anchor="middle" font-size="19" font-weight="900" fill="#071a36">13 DIGITS</text><text x="375" y="270" text-anchor="middle" font-size="15" font-weight="800" fill="#a7560d">INVOICE</text><text x="375" y="297" text-anchor="middle" font-size="19" font-weight="900" fill="#071a36">READY</text></svg></div></div></section>
 
-<section class="present-card soft" id="p9">
-  <span class="esg-badge">🌳 EV / ESG</span>
-  <h2>Every Ride! Save Tree!!!</h2>
-  <p>Completed EV trips can generate an estimated CO₂ avoided value and a tree-equivalent impact based on configured operational assumptions. The system clearly labels these as sustainability estimates, not certified carbon credits.</p>
-  <div class="present-grid">
-    <div class="present-tile"><h3>Per Trip</h3><p>Distance, estimated CO₂ avoided and tree equivalent.</p></div>
-    <div class="present-tile"><h3>Fleet Total</h3><p>EV utilization, cumulative green trips and monthly impact.</p></div>
-    <div class="present-tile"><h3>Corporate Report</h3><p>Green mobility information that can support internal ESG reporting.</p></div>
-  </div>
-  <div class="present-actions"><a class="btn btn-primary" href="esg.html">Open ESG Demo</a></div>
-</section>
+<section class="present-card" id="p8"><div class="visual-split"><div><span class="eyebrow">HERO PAY READY</span><h2>Simple customer payment flow.</h2><div class="present-grid two"><div class="present-tile"><h3>10% Reservation Deposit</h3><p>Confirm the advance booking with HERO PAY PromptPay QR or Credit / Debit Card.</p></div><div class="present-tile"><h3>90% Balance</h3><p>Collect the remaining balance before service and retain a clear payment status.</p></div></div><div class="present-actions"><a class="btn btn-primary" href="payment.html">Try Payment Screen</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="PromptPay QR and credit card payment"><rect width="600" height="430" rx="28" fill="#f8fafc"/><rect x="66" y="74" width="205" height="282" rx="28" fill="#071a36"/><rect x="87" y="107" width="163" height="165" rx="12" fill="#fff"/><g fill="#071a36"><rect x="106" y="126" width="35" height="35"/><rect x="196" y="126" width="35" height="35"/><rect x="106" y="216" width="35" height="35"/><rect x="158" y="178" width="18" height="18"/><rect x="183" y="202" width="18" height="18"/><rect x="147" y="230" width="18" height="18"/></g><text x="168" y="306" text-anchor="middle" font-size="18" font-weight="900" fill="#fff">PromptPay QR</text><rect x="322" y="126" width="218" height="142" rx="22" fill="#ff8618"/><rect x="346" y="165" width="70" height="42" rx="8" fill="#ffd1a5"/><rect x="346" y="226" width="122" height="10" rx="5" fill="#fff" opacity=".9"/><text x="431" y="298" text-anchor="middle" font-size="18" font-weight="900" fill="#071a36">Credit / Debit Card</text><text x="431" y="328" text-anchor="middle" font-size="16" fill="#66758a">10% deposit • 90% balance</text></svg></div></div></section>
 
-<section class="present-card dark" id="p10">
-  <span class="eyebrow">HERO MEMBERSHIP</span>
-  <h2>Book first. Membership is optional.</h2>
-  <p>Customers may continue as guests, sign in, or sign up as Individual or Corporate members. New members receive 200 HERO Credits immediately and can accumulate more benefits over time.</p>
-  <div class="present-actions"><a class="btn btn-primary" href="membership.html">Try Membership</a><a class="btn btn-outline" href="customer-portal.html">View Member Portal</a></div>
-</section>
+<section class="present-card soft" id="p9"><div class="visual-split"><div><span class="esg-badge">🌳 EV / ESG</span><h2>Every Ride! Save Tree!!!</h2><p>Completed EV trips can generate an estimated CO₂ avoided value and a tree-equivalent impact based on configured operational assumptions. The system clearly labels these as sustainability estimates, not certified carbon credits.</p><div class="present-grid"><div class="present-tile"><h3>Per Trip</h3><p>Distance, estimated CO₂ avoided and tree equivalent.</p></div><div class="present-tile"><h3>Fleet Total</h3><p>EV utilization, cumulative green trips and monthly impact.</p></div><div class="present-tile"><h3>Corporate Report</h3><p>Green mobility information that can support internal ESG reporting.</p></div></div><div class="present-actions"><a class="btn btn-primary" href="esg.html">Open ESG Demo</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="Electric vehicle and tree equivalent ESG impact"><rect width="600" height="430" rx="28" fill="#eaf5ef"/><circle cx="468" cy="100" r="52" fill="#c8ead8"/><path d="M460 155 v138" stroke="#6a8f77" stroke-width="16" stroke-linecap="round"/><circle cx="420" cy="145" r="55" fill="#2d9b68"/><circle cx="495" cy="153" r="62" fill="#36a873"/><circle cx="455" cy="102" r="70" fill="#48b27e"/><rect x="94" y="245" width="280" height="70" rx="28" fill="#fff"/><path d="M148 245 L190 205 H292 L335 245Z" fill="#dbe8ef"/><circle cx="160" cy="315" r="29" fill="#1b293a"/><circle cx="312" cy="315" r="29" fill="#1b293a"/><text x="234" y="286" text-anchor="middle" font-size="20" font-weight="900" fill="#17684b">100% EV</text><text x="300" y="58" text-anchor="middle" font-size="30" font-weight="900" fill="#17684b">CO₂ AVOIDED → TREE EQUIVALENT</text><text x="300" y="381" text-anchor="middle" font-size="20" font-weight="800" fill="#071a36">Per trip • Monthly • Corporate ESG</text></svg></div></div></section>
 
-<section class="present-card" id="p11">
-  <span class="eyebrow">LIVE DEMO</span>
-  <div class="quote">Don't just read about HERO Move. Try it.</div>
-  <div class="present-grid">
-    <div class="present-tile"><h3>Customer</h3><p>Book and join the HERO ecosystem.</p><a href="booking.html">Start →</a></div>
-    <div class="present-tile"><h3>Driver</h3><p>Experience the job workflow.</p><a href="driver-portal.html">Start →</a></div>
-    <div class="present-tile"><h3>Operator</h3><p>Manage the entire transport operation.</p><a href="admin.html">Start →</a></div>
-  </div>
-</section>
+<section class="present-card dark" id="p10"><div class="visual-split"><div><span class="eyebrow">HERO MEMBERSHIP</span><h2>Book first. Membership is optional.</h2><p>Customers may continue as guests, sign in, or sign up as Individual or Corporate members. New members receive 200 HERO Credits immediately and can accumulate more benefits over time.</p><div class="present-actions"><a class="btn btn-primary" href="membership.html">Try Membership</a><a class="btn btn-outline" href="customer-portal.html">View Member Portal</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="HERO Credits membership card"><rect width="600" height="430" rx="28" fill="#0d2a50"/><rect x="98" y="96" width="404" height="238" rx="28" fill="#fff"/><circle cx="164" cy="170" r="42" fill="#ff8618"/><text x="164" y="178" text-anchor="middle" font-size="22" font-weight="900" fill="#172238">H</text><text x="230" y="156" font-size="22" font-weight="900" fill="#071a36">HERO MEMBER</text><text x="230" y="188" font-size="16" fill="#66758a">Individual / Corporate</text><text x="132" y="264" font-size="18" font-weight="800" fill="#66758a">WELCOME BONUS</text><text x="132" y="306" font-size="44" font-weight="900" fill="#ff8618">200</text><text x="252" y="304" font-size="21" font-weight="900" fill="#071a36">HERO Credits</text></svg></div></div></section>
 
-<section class="present-card dark" id="p12">
-  <span class="eyebrow">HERO MOVE</span>
-  <h2>Move People. Move Business.</h2>
-  <p>A flexible mobility operating platform for transportation companies that want better booking, stronger operations, digital payments, customer loyalty and measurable EV impact in one system.</p>
-  <div class="present-actions"><a class="btn btn-primary" href="booking.html">Try Live Demo</a><a class="btn btn-outline" href="index.html">Return Home</a></div>
-</section>
+<section class="present-card" id="p11"><span class="eyebrow">LIVE DEMO</span><div class="quote">Don't just read about HERO Move. Try it.</div><div class="present-grid"><div class="present-tile"><h3>🚗 Customer</h3><p>Book and join the HERO ecosystem.</p><a href="booking.html">Start →</a></div><div class="present-tile"><h3>👨‍✈️ Driver</h3><p>Experience the job workflow.</p><a href="driver-portal.html">Start →</a></div><div class="present-tile"><h3>🏢 Operator</h3><p>Manage the entire transport operation.</p><a href="admin.html">Start →</a></div></div></section>
+
+<section class="present-card dark" id="p12"><div class="visual-split"><div><span class="eyebrow">HERO MOVE</span><h2>Move People. Move Business.</h2><p>A flexible mobility operating platform for transportation companies that want better booking, stronger operations, digital payments, customer loyalty and measurable EV impact in one system.</p><div class="present-actions"><a class="btn btn-primary" href="booking.html">Try Live Demo</a><a class="btn btn-outline" href="index.html">Return Home</a></div></div><div class="visual-frame"><svg class="scene" viewBox="0 0 600 430" role="img" aria-label="HERO Move platform summary"><rect width="600" height="430" rx="28" fill="#0d2a50"/><circle cx="300" cy="176" r="92" fill="#ff8618"/><text x="300" y="165" text-anchor="middle" font-size="26" font-weight="900" fill="#172238">HERO</text><text x="300" y="201" text-anchor="middle" font-size="32" font-weight="900" fill="#172238">Move</text><g fill="#fff" font-size="16" font-weight="800" text-anchor="middle"><text x="105" y="102">BOOKING</text><text x="495" y="102">FLEET</text><text x="95" y="322">DRIVERS</text><text x="505" y="322">HERO PAY</text><text x="300" y="390">ESG • CREDITS • CORPORATE</text></g><g stroke="#fff" stroke-width="3" opacity=".7"><line x1="158" y1="116" x2="224" y2="145"/><line x1="442" y1="116" x2="376" y2="145"/><line x1="160" y1="305" x2="224" y2="225"/><line x1="440" y1="305" x2="376" y2="225"/></g></svg></div></div></section>
 </main>
-
-<div class="present-nav" aria-label="Presentation navigation">
-  <a href="index.html">⌂ Home</a>
-  <button id="prevBtn" type="button">← Back</button>
-  <button id="nextBtn" type="button">Next →</button>
-  <a class="primary" href="booking.html">Try Live Demo</a>
-</div>
-<script>
-const slides=[...document.querySelectorAll('.present-card')];
-function currentIndex(){let best=0,bestDist=Infinity;slides.forEach((s,i)=>{const d=Math.abs(s.getBoundingClientRect().top-90);if(d<bestDist){bestDist=d;best=i}});return best}
-document.getElementById('prevBtn').addEventListener('click',()=>{const i=currentIndex();slides[Math.max(0,i-1)].scrollIntoView({behavior:'smooth'})});
-document.getElementById('nextBtn').addEventListener('click',()=>{const i=currentIndex();slides[Math.min(slides.length-1,i+1)].scrollIntoView({behavior:'smooth'})});
-</script>
+<div class="present-nav" aria-label="Presentation navigation"><a href="index.html">⌂ Home</a><button id="prevBtn" type="button">← Back</button><button id="nextBtn" type="button">Next →</button><a class="primary" href="booking.html">Try Live Demo</a></div>
+<script>const slides=[...document.querySelectorAll('.present-card')];function currentIndex(){let best=0,bestDist=Infinity;slides.forEach((s,i)=>{const d=Math.abs(s.getBoundingClientRect().top-90);if(d<bestDist){bestDist=d;best=i}});return best}document.getElementById('prevBtn').addEventListener('click',()=>{const i=currentIndex();slides[Math.max(0,i-1)].scrollIntoView({behavior:'smooth'})});document.getElementById('nextBtn').addEventListener('click',()=>{const i=currentIndex();slides[Math.min(slides.length-1,i+1)].scrollIntoView({behavior:'smooth'})});</script>
 </body>
 </html>
