@@ -1,9 +1,15 @@
 const HM={
-  key:{lang:'hm_lang',vehicles:'hm_vehicles',bookings:'hm_bookings',maintenance:'hm_maintenance',drivers:'hm_drivers',customers:'hm_customers'},
+  key:{lang:'hm_lang',vehicles:'hm_vehicles',bookings:'hm_bookings',maintenance:'hm_maintenance',drivers:'hm_drivers',customers:'hm_customers',invoices:'hm_invoices',pricing:'hm_pricing',settings:'hm_settings',audit:'hm_audit'},
   get(k,f=[]){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
   set(k,v){localStorage.setItem(k,JSON.stringify(v))},
   uid(prefix){return `${prefix}-${new Date().toISOString().slice(0,10).replaceAll('-','')}-${Math.random().toString(36).slice(2,7).toUpperCase()}`},
-  money(n){return new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:0}).format(Number(n||0))},
+  money(n){return new Intl.NumberFormat('th-TH',{style:'currency',currency:'THB',maximumFractionDigits:2}).format(Number(n||0))},
+  audit(action,detail=''){const a=this.get(this.key.audit);a.unshift({id:this.uid('LOG'),at:new Date().toISOString(),action,detail});this.set(this.key.audit,a.slice(0,500))},
+  taxIdValid(v){return /^\d{13}$/.test(String(v||'').replace(/\D/g,''))},
+  serviceHours(service=''){if(service.includes('3 Hours'))return 3;if(service.includes('5 Hours'))return 5;if(service.includes('8 Hours'))return 8;if(service.includes('Full Day'))return 10;return 2},
+  overlap(a,b){if(!a.date||!b.date||a.date!==b.date)return false;const m=x=>{const [h,min]=String(x.time||'00:00').split(':').map(Number);return h*60+min};const a0=m(a),a1=a0+this.serviceHours(a.service)*60,b0=m(b),b1=b0+this.serviceHours(b.service)*60;return a0<b1&&b0<a1},
+  isResourceBusy(type,id,bookingId){if(!id)return false;const bs=this.get(this.key.bookings).filter(b=>b.id!==bookingId&&!['Cancelled','Completed'].includes(b.status));const target=bs.find(b=>b.id===bookingId);if(!target)return false;return bs.some(b=>this.overlap(target,b)&&((type==='vehicle'&&b.vehicleId===id)||(type==='driver'&&b.driverId===id)))},
+  invoiceNo(){const d=new Date(),ym=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}`;const list=this.get(this.key.invoices);const n=list.filter(x=>String(x.number||'').startsWith(`INV-${ym}-`)).length+1;return `INV-${ym}-${String(n).padStart(5,'0')}`},
   initDemo(){
     if(!localStorage.getItem(this.key.vehicles)) this.set(this.key.vehicles,[
       {id:'HM-EV-DEMO-001',plate:'DEMO-001',brand:'MG',model:'Maxus 9',year:'2026',energy:'EV',seats:6,odometer:18500,status:'Available',battery:96,revenue:12400,trips:4,hours:18.5,nextServiceKm:22000,insuranceExpiry:'2027-03-31',registrationExpiry:'2027-03-31',notes:'Demo record — replace with actual fleet data.'},
@@ -16,8 +22,19 @@ const HM={
       {id:'DRV-DEMO-002',name:'Demo Driver B',mobile:'08x-xxx-0002',licenceNo:'DEMO-LIC-002',licenceExpiry:'2027-05-31',status:'Assigned',vehicleId:'HM-EV-DEMO-002',rating:4.8,trips:22,hours:96,notes:'Demo record'}
     ]);
     if(!localStorage.getItem(this.key.customers)) this.set(this.key.customers,[
-      {id:'CUS-DEMO-001',type:'Corporate',name:'Demo Corporate Account',contactPerson:'Demo Contact',mobile:'02-xxx-xxxx',email:'demo@example.com',taxId:'DEMO-TAX-ID',billingAddress:'Bangkok',paymentTerms:'30 Days',status:'Active',notes:'Demo record'}
+      {id:'CUS-DEMO-001',type:'Corporate',name:'Demo Corporate Account Co., Ltd.',legalNameTh:'บริษัท เดโม คอร์ปอเรท จำกัด',legalNameEn:'Demo Corporate Account Co., Ltd.',branchType:'Head Office',branchNo:'00000',contactPerson:'Demo Contact',mobile:'02-xxx-xxxx',email:'demo@example.com',billingEmail:'billing@example.com',taxId:'0100000000000',addressLine:'99 Demo Road',subdistrict:'Demo',district:'Demo',province:'Bangkok',postalCode:'10110',country:'Thailand',paymentTerms:'30 Days',invoicePreference:'Tax Invoice / Receipt',poRequired:'No',costCenter:'',status:'Active',notes:'Demo record'}
     ]);
+    if(!localStorage.getItem(this.key.invoices)) this.set(this.key.invoices,[]);
+    if(!localStorage.getItem(this.key.pricing)) this.set(this.key.pricing,[
+      {id:'PR-3H',service:'Business Class Ride — 3 Hours',price:1100,depositPct:10,active:true},
+      {id:'PR-5H',service:'Business Class Ride — 5 Hours',price:1800,depositPct:10,active:true},
+      {id:'PR-8H',service:'Business Class Ride — 8 Hours',price:2600,depositPct:10,active:true},
+      {id:'PR-FD',service:'Full Day Chauffeur',price:3500,depositPct:10,active:true},
+      {id:'PR-AT',service:'Airport Transfer',price:1200,depositPct:10,active:true},
+      {id:'PR-CT',service:'Corporate Executive Transfer',price:1500,depositPct:10,active:true}
+    ]);
+    if(!localStorage.getItem(this.key.settings)) this.set(this.key.settings,{operatorName:'HERO Move Enterprise',legalName:'',taxId:'',branchType:'Head Office',branchNo:'00000',address:'',phone:'',email:'',billingEmail:'',currency:'THB',vatRate:7,invoicePrefix:'INV',brandPrimary:'#071a36',brandAccent:'#ff8618'});
+    if(!localStorage.getItem(this.key.audit)) this.set(this.key.audit,[]);
   }
 };
 HM.initDemo();
