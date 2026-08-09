@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Secure Sign In | HERO Move</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="production.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">HM</span><strong>HERO <em>Move</em></strong></a>
+    <div class="top-actions"><a class="btn btn-outline small-btn" href="index.html">Home</a></div>
+  </header>
+  <main class="auth-shell">
+    <section class="auth-copy">
+      <span class="eyebrow">SECURE ROLE-BASED ACCESS</span>
+      <h1>One platform.<br>Your role.</h1>
+      <p>Customers, corporate teams, chauffeurs and operators sign in to separate protected workspaces. Access is enforced by Supabase Authentication and tenant-scoped permissions.</p>
+    </section>
+    <section class="auth-panel">
+      <span class="eyebrow">HERO MOVE</span>
+      <h2>Sign in</h2>
+      <p class="notice">Use the email address connected to your HERO Move membership or assigned role.</p>
+      <form id="loginForm">
+        <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="email" required></div>
+        <div class="field" style="margin-top:14px"><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password" minlength="8" required></div>
+        <button class="btn btn-primary" type="submit">Secure Sign In</button>
+        <div class="booking-status" id="loginStatus" role="status"></div>
+      </form>
+      <div class="summary-box"><div class="summary-row"><span>Not a member?</span><a href="membership.html">Join + 200 HERO Credits</a></div><div class="summary-row"><span>Booking as guest?</span><a href="booking.html">Continue without account</a></div></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    HM.domReady().then(()=>{
+      const status=document.getElementById('loginStatus');
+      loginForm.addEventListener('submit',async e=>{
+        e.preventDefault();status.className='booking-status show warn';status.textContent='Signing in securely…';
+        try{
+          await HM.auth.signIn(loginEmail.value.trim(),loginPassword.value);
+          const data=await HM.refresh();
+          status.className='booking-status show ok';status.textContent='Signed in. Opening your secure portal…';
+          const requested=new URLSearchParams(location.search).get('next');
+          const safeNext=requested&&/^[a-z0-9-]+\.html$/i.test(requested)?requested:null;
+          const roles=data.auth?.roles||[];
+          const destination=safeNext||(roles.includes('driver')?'driver-portal.html':roles.some(r=>['owner','admin','operator','dispatcher','finance'].includes(r))?'admin.html':'customer-portal.html');
+          location.href=destination;
+        }catch(error){status.className='booking-status show error';status.textContent=error.message}
+      })
+    })
+  </script>
+</body>
+</html>
