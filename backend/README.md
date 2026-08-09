@@ -1,62 +1,54 @@
-# HERO Move Backend — Ready for Notebook Connection
+# HERO Move Production Backend
 
-The frontend is currently functional with browser storage. This folder prepares the Google Apps Script + Google Sheets backend so the production connection can be completed without redesigning the data model.
+HERO Move production mode uses Supabase PostgreSQL, Supabase Authentication, Row Level Security and the `hero-move-api` Edge Function.
 
-## One-time setup
+## Source of truth
 
-1. Create a Google Sheet named `HERO Move Backend`.
-2. Open **Extensions → Apps Script**.
-3. Replace the default script with `backend/Code.gs` from this repository.
-4. Run `setupHeroMoveBackend()` once and authorize it.
-5. In Apps Script **Project Settings → Script Properties**, add `HERO_MOVE_API_KEY` with a strong secret.
-6. Deploy as **Web app**. Execute as the owner. Restrict access as appropriate for the production architecture.
-7. Put the deployed endpoint and API key into protected Cloudflare environment variables / server-side integration. Do **not** expose the API key in public JavaScript.
+- Schema migration: `supabase/migrations/20260808000000_hero_move_production_foundation.sql`
+- Secured API: `supabase/functions/hero-move-api/index.ts`
+- Browser integration: `app.js`
+- Production mode: default on `hero-move.pages.dev`
+- Demo mode: explicit `?demo=1`; data remains isolated from production
 
-## Sheets created automatically
+Core customers, bookings, vehicles, drivers, payments, invoices and HERO Credits are never stored in browser localStorage. Browser storage is limited to authentication session material, language preference, explicit demo state and short-lived checkout continuity; PostgreSQL remains authoritative.
 
-- Members
-- Customers
-- Bookings
-- Vehicles
-- Drivers
-- Maintenance
-- Payments
-- Invoices
-- HeroCredits
-- Partners
-- AuditLog
+## Security model
 
-## Frontend-to-backend mapping
+- Every commercial record carries `operator_id`.
+- RLS is enabled on every exposed production table.
+- Tenant membership is stored in `operator_users`.
+- Customer, corporate, driver, operator, administrator and future partner roles are separated.
+- Browser clients receive only a publishable/legacy anon key.
+- The service-role key stays inside the Edge Function runtime.
+- Privileged writes are validated server-side and written to `audit_logs`.
+- Vehicle and driver double-booking is blocked by PostgreSQL exclusion constraints in addition to API availability checks.
 
-- `membership.html` → Members, Customers, HeroCredits
-- `booking.html` → Bookings
-- `payment.html` → Payments (after HERO PAY connection)
-- `fleet.html` → Vehicles, Maintenance
-- `drivers.html` / `driver-portal.html` → Drivers, Bookings
-- `customers.html` → Customers
-- `dispatch.html` → Bookings, Vehicles, Drivers, HeroCredits, ESG fields
-- `invoices.html` → Invoices + saved Customer tax profile
-- `partner-portal.html` → Partners
-- `esg.html` → completed Bookings + Vehicles
+## Business functions
 
-## Payment scope
+The Edge API provides:
 
-HERO Move v1 exposes only:
+- authoritative price calculation
+- real vehicle/driver/maintenance availability checks
+- guest or member booking creation
+- individual and corporate membership creation
+- welcome, Ride & Earn and Refer & Earn ledger entries
+- resource assignment with conflict checks
+- controlled trip-status transitions
+- HERO Credits redemption
+- owner service/pricing settings
+- owner HERO Credits settings
+- provider-neutral connected-payment settings
+- ESG estimate generation at eligible trip completion
+- tenant-scoped portal bootstrap data
 
-- HERO PAY PromptPay QR
-- Credit / Debit Card
+## Payment status
 
-Corporate Account / credit terms are intentionally excluded from the payment scope.
+The provider-neutral adapter supports PromptPay QR, cards, wallets, international methods, payment links, deposit, balance, full payment, failures, refunds, receipts and tax invoices. Live processing remains disabled until an approved provider and server-side credentials are configured by the operator.
 
-## ESG scope
+## ESG status
 
-The current frontend calculates an **estimated** operational CO2 avoided value and tree equivalent per completed EV trip. These figures are not certified carbon credits. Production ESG factors should be configured from verified sources before external formal reporting.
+ESG records use an operator-configured methodology and are clearly labeled as estimates. HERO Move does not claim certified carbon credits.
 
-## Production requirements still needing credentials
+## Legacy reference
 
-- Google Apps Script deployment URL / production database endpoint
-- HERO PAY merchant/API credentials
-- Authentication provider / role configuration
-- Email and LINE OA credentials
-- Optional Google Maps API
-- Cloudflare environment variables
+`legacy/Code.gs` is retained only as historical reference. It is not used by production mode and must not be deployed as the HERO Move production database.

@@ -1,1 +1,55 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Payment | HERO Move</title><link rel="stylesheet" href="styles.css"><style>.hero-pay-wordmark{display:inline-flex;align-items:center;font-weight:950;font-size:1.35rem;letter-spacing:-.04em}.hero-pay-wordmark .hero{background:linear-gradient(90deg,#f21868,#5a3bea);-webkit-background-clip:text;color:transparent}.hero-pay-wordmark .pay{color:#071a36;margin-left:4px}.pay-note{background:#f2f6fb;border:1px solid var(--line);padding:16px;border-radius:16px;margin-top:18px}.pay-note strong{color:var(--navy)}.method-list{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.method-list span{padding:7px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);font-weight:700;font-size:.86rem}</style></head><body><header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">HM</span><strong>HERO <em>Move</em></strong></a><div class="top-actions"><a class="btn btn-outline small-btn" href="customer-portal.html">My HERO Move</a></div></header><main class="page-shell"><div class="page-title"><div><span class="eyebrow">CUSTOMER · PAYMENT</span><h1>Secure your booking</h1><p>Pay the reservation deposit through <span class="hero-pay-wordmark"><span class="hero">HERO</span><span class="pay">PAY</span></span>.</p></div></div><div class="grid-two"><div class="form-card"><h2>Booking Summary</h2><div id="bookingSummary" class="summary-box"></div><div class="pay-note"><strong>Powered by <span class="hero-pay-wordmark"><span class="hero">HERO</span><span class="pay">PAY</span></span></strong><div class="method-list"><span>PromptPay QR</span><span>Thai Credit Cards</span><span>International Cards</span><span>TrueMoney</span><span>Alipay</span><span>Rabbit LINE Pay</span><span>WeChat Pay</span><span>ShopeePay</span></div></div></div><form class="form-card" id="paymentForm"><h2>Choose Payment Method</h2><div class="cards two"><button class="card pay-method" type="button" data-method="HERO PAY PromptPay QR"><h3><span class="hero-pay-wordmark"><span class="hero">HERO</span><span class="pay">PAY</span></span></h3><p>PromptPay QR</p></button><button class="card pay-method" type="button" data-method="HERO PAY Card / Wallet"><h3><span class="hero-pay-wordmark"><span class="hero">HERO</span><span class="pay">PAY</span></span></h3><p>Cards & supported digital wallets</p></button></div><div class="summary-box" style="margin-top:18px"><div class="summary-row"><span>Amount Due</span><strong id="amountDue">—</strong></div><div class="summary-row"><span>Selected Method</span><strong id="selectedMethod">Choose above</strong></div></div><button class="btn btn-primary" style="width:100%;margin-top:16px" id="payBtn" disabled>HERO PAY Connection Pending</button><p class="notice">HERO PAY supports PromptPay QR, credit/debit cards and participating digital wallets. Actual payment processing will activate when the production payment API is connected.</p></form></div></main><script src="app.js"></script><script>document.addEventListener('DOMContentLoaded',()=>{const id=new URLSearchParams(location.search).get('booking');const bs=HM.get(HM.key.bookings),b=bs.find(x=>x.id===id)||bs[0];if(!b){bookingSummary.innerHTML='No booking selected.';return}bookingSummary.innerHTML=`<strong>${b.id}</strong><br>${b.service}<br>${b.date||'—'} ${b.time||''}<br>${b.pickup||''} → ${b.dest1||''}<br><br>Total: <b>${HM.money(b.price)}</b><br>10% Deposit: <b>${HM.money(b.deposit)}</b><br>90% Balance: ${HM.money(b.balance)}`;amountDue.textContent=HM.money(b.deposit);document.querySelectorAll('.pay-method').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.pay-method').forEach(x=>x.style.outline='none');btn.style.outline='2px solid var(--orange)';selectedMethod.textContent=btn.dataset.method;b.paymentMethod=btn.dataset.method;HM.set(HM.key.bookings,bs);payBtn.disabled=true}))});</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Secure Payment | HERO Move</title>
+  <meta name="description" content="Provider-neutral secure payment for HERO Move bookings.">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="production.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">HM</span><strong>HERO <em>Move</em></strong></a><div class="top-actions"><a class="btn btn-outline small-btn" href="booking.html">Back</a><a class="btn btn-outline small-btn" href="customer-portal.html">Customer Portal</a></div></header>
+  <main class="page-shell">
+    <div class="flow-steps"><span class="done">1 · Trip</span><span class="done">2 · Fare</span><span class="done">3 · Customer</span><span class="done">4 · Confirm</span><span class="active">5 · Secure Payment</span></div>
+    <div class="page-title"><div><span class="eyebrow">CONNECTED PAYMENTS</span><h1>Simple, secure & flexible payment.</h1><p>HERO Move uses a provider-neutral payment adapter. Gateway branding, credentials and live methods are controlled by the operator.</p></div></div>
+    <div class="grid-two">
+      <section class="form-card">
+        <h2>Booking Summary</h2><div id="bookingSummary" class="summary-box"></div>
+        <h3 style="color:var(--navy);margin-top:24px">Supported Payment Methods</h3>
+        <div class="payment-methods" id="paymentMethods">
+          <button class="payment-method" data-method="promptpay_qr" type="button"><strong>PromptPay QR</strong><br><small>Thai QR payment</small></button>
+          <button class="payment-method" data-method="credit_card" type="button"><strong>Credit Card</strong><br><small>Thai and international cards</small></button>
+          <button class="payment-method" data-method="debit_card" type="button"><strong>Debit Card</strong><br><small>Supported debit cards</small></button>
+          <button class="payment-method" data-method="wallet" type="button"><strong>Digital Wallets</strong><br><small>Configured wallet providers</small></button>
+          <button class="payment-method" data-method="international" type="button"><strong>International Methods</strong><br><small>Configured cross-border methods</small></button>
+          <button class="payment-method" data-method="payment_link" type="button"><strong>Payment Link</strong><br><small>Secure link issued by operator</small></button>
+        </div>
+        <button class="btn btn-primary" id="paymentButton" type="button" style="width:100%;margin-top:18px">CONTINUE SECURE PAYMENT</button>
+        <div class="booking-status" id="paymentStatus" role="status"></div>
+      </section>
+      <aside class="form-card">
+        <span class="eyebrow">PAYMENT ARCHITECTURE</span><h2>Connected, not locked in.</h2>
+        <div class="summary-box"><div class="summary-row"><span>HERO Move</span><strong>Booking source</strong></div><div class="summary-row"><span>Payment Adapter</span><strong>Provider-neutral</strong></div><div class="summary-row"><span>Provider</span><strong id="providerState">Configured by operator</strong></div><div class="summary-row"><span>Receipt / Tax Invoice</span><strong>Connected to trip</strong></div></div>
+        <p class="notice">No payment provider has been publicly branded. Live processing activates only after the operator selects and configures an approved gateway. No MDR is displayed to customers.</p>
+        <div class="hero-actions"><a class="btn btn-outline" href="booking.html">New Booking</a><a class="btn btn-outline" href="index.html">Home</a></div>
+      </aside>
+    </div>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    let selectedMethod='';
+    HM.onReady(()=>{
+      let context=null;try{context=JSON.parse(sessionStorage.getItem('hm_checkout_context'))}catch{}
+      const settings=HM.bootData.paymentSettings||{};providerState.textContent=settings.provider_mode==='live'?'Live provider connected':settings.provider_mode==='test'?'Secure test mode':'Awaiting operator gateway configuration';
+      const enabled=new Set(settings.enabled_methods||[]);document.querySelectorAll('.payment-method').forEach(button=>{if(enabled.size&&!enabled.has(button.dataset.method)&&button.dataset.method!=='payment_link')button.hidden=true;button.addEventListener('click',()=>{document.querySelectorAll('.payment-method').forEach(x=>x.classList.remove('active'));button.classList.add('active');selectedMethod=button.dataset.method})});
+      if(context?.booking){bookingSummary.innerHTML=`<div class="summary-row"><span>Booking</span><strong>${context.booking.bookingNumber||context.booking.id}</strong></div><div class="summary-row"><span>Status</span><strong>${context.booking.status}</strong></div><div class="summary-row"><span>Reservation deposit</span><strong>${HM.money(context.quote?.deposit)}</strong></div><div class="summary-row total"><span>Total fare</span><strong>${HM.money(context.quote?.total)}</strong></div>`}else{bookingSummary.innerHTML='<p>No booking is selected.</p><a class="btn btn-primary" href="booking.html">Start a Booking</a>';paymentButton.disabled=true}
+      paymentButton.addEventListener('click',()=>{
+        if(!selectedMethod){paymentStatus.className='booking-status show error';paymentStatus.textContent='Choose a supported payment method first.';return}
+        if(settings.provider_mode!=='live'){
+          paymentStatus.className='booking-status show warn';paymentStatus.innerHTML='Your booking is safely recorded, but live gateway processing is not enabled yet. The operator can issue a provider-neutral secure payment link without changing the booking.<br><br><a class="btn btn-navy" href="customer-portal.html">View Booking Status</a> <a class="btn btn-outline" href="index.html">Home</a>';return
+        }
+        paymentStatus.className='booking-status show warn';paymentStatus.textContent='Opening the configured secure payment provider…'
+      })
+    })
+  </script>
+</body>
+</html>

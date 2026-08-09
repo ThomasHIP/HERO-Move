@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Corporate Portal | HERO Move</title><meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="production.css"></head>
+<body data-requires-role="corporate_user">
+  <header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">HM</span><strong>HERO <em>Move</em></strong></a><div class="top-actions"><a class="btn btn-primary small-btn" href="booking.html">Corporate Booking</a><button class="btn btn-outline small-btn" id="signOutButton" type="button">Sign Out</button></div></header>
+  <main class="page-shell">
+    <div class="page-title"><div><span class="eyebrow">CORPORATE CUSTOMER</span><h1>Corporate Mobility</h1><p>Company identity, travellers, booking history, payments, invoices, HERO Credits and estimated EV / ESG impact — separated from operator controls.</p></div></div>
+    <section class="dashboard-grid"><div class="stat"><small>Upcoming Trips</small><strong id="upcomingCount">0</strong></div><div class="stat"><small>Completed Trips</small><strong id="completedCount">0</strong></div><div class="stat"><small>Payment Due</small><strong id="paymentDue">0</strong></div><div class="stat reward-panel"><small>HERO Credits</small><strong class="reward-number" id="creditBalance">0</strong></div></section>
+    <div class="grid-two">
+      <section class="form-card"><h2>Company Profile</h2><div class="summary-box" id="companyProfile"></div></section>
+      <section class="form-card"><h2>Billing & Tax Profile</h2><div class="summary-box" id="billingProfile"></div></section>
+    </div>
+    <section style="margin-top:22px"><div class="table-card"><h2>Employee & Traveller List</h2><table><thead><tr><th>Traveller</th><th>Email</th><th>Mobile</th><th>Notes</th></tr></thead><tbody id="travellerRows"></tbody></table></div></section>
+    <section style="margin-top:22px"><div class="table-card"><h2>Upcoming Trips & Booking History</h2><table><thead><tr><th>Booking</th><th>Date</th><th>Traveller</th><th>Service</th><th>Route</th><th>Payment</th><th>Status</th></tr></thead><tbody id="bookingRows"></tbody></table></div></section>
+    <div class="grid-two" style="margin-top:22px">
+      <section class="table-card"><h2>Invoices, Receipts & Tax Invoices</h2><table><thead><tr><th>Document</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody id="invoiceRows"></tbody></table></section>
+      <section class="table-card"><h2>EV / ESG Report</h2><table><thead><tr><th>Trip</th><th>Distance</th><th>Est. CO₂ Avoided</th><th>Tree Equivalent</th></tr></thead><tbody id="esgRows"></tbody></table></section>
+    </div>
+    <section class="form-card reward-panel" style="margin-top:22px"><h2>Corporate HERO Credits & Rewards</h2><p>One tenant-scoped ledger supports corporate rewards while operator settings control earning, redemption, expiry and eligible categories.</p><div class="hero-actions"><a class="btn btn-primary" href="booking.html">Book Corporate Travel</a><a class="btn btn-outline" href="presentation.html#s11">How ESG Estimates Work</a></div></section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    HM.onReady(()=>{
+      signOutButton.addEventListener('click',()=>HM.auth.signOut());const company=HM.bootData.corporateAccount||{},travellers=HM.bootData.travellers||[],bookings=HM.get(HM.key.bookings),invoices=HM.get(HM.key.invoices),payments=HM.get(HM.key.payments),esg=HM.bootData.esgRecords||[];
+      const upcoming=bookings.filter(b=>!['Completed','Cancelled'].includes(b.status)),completed=bookings.filter(b=>b.status==='Completed');upcomingCount.textContent=upcoming.length;completedCount.textContent=completed.length;paymentDue.textContent=payments.filter(p=>!['paid','refunded'].includes(p.status)).length;creditBalance.textContent=HM.creditBalance().toLocaleString();
+      companyProfile.innerHTML=`<strong>${company.legal_company_name||'Corporate Account'}</strong><br>${company.trading_name||''}<br>Contact: ${company.contact_person||'—'} · ${company.contact_mobile||'—'}`;
+      const address=company.billing_address||{};billingProfile.innerHTML=`Tax ID: <b>${company.tax_id||'—'}</b><br>Branch: ${company.branch_type||'head_office'} ${company.branch_number||'00000'}<br>${address.line1||''} ${address.province||''} ${address.postalCode||''}<br>${company.billing_email||''}`;
+      travellerRows.innerHTML=travellers.length?travellers.map(t=>`<tr><td>${t.full_name}</td><td>${t.email||'—'}</td><td>${t.mobile||'—'}</td><td>${t.notes||'—'}</td></tr>`).join(''):'<tr><td colspan="4">No saved travellers yet.</td></tr>';
+      bookingRows.innerHTML=bookings.length?bookings.map(b=>`<tr><td>${b.bookingNumber||b.id}</td><td>${b.date||'—'} ${b.time||''}</td><td>${b.customer}</td><td>${b.service}</td><td>${b.pickup} → ${b.dest1||'—'}</td><td>${b.paymentStatus}</td><td><span class="badge ${b.status==='Completed'?'green':b.status==='Cancelled'?'red':'orange'}">${b.status}</span></td></tr>`).join(''):'<tr><td colspan="7">No corporate bookings yet.</td></tr>';
+      invoiceRows.innerHTML=invoices.length?invoices.map(i=>`<tr><td>${i.invoice_number}</td><td>${i.issued_on}</td><td>${HM.money(i.total_amount)}</td><td>${i.status}</td></tr>`).join(''):'<tr><td colspan="4">No invoices or receipts yet.</td></tr>';
+      esgRows.innerHTML=esg.length?esg.map(x=>`<tr><td>${x.bookings?.booking_number||x.booking_id}</td><td>${x.distance_km} km</td><td>${Number(x.estimated_co2_avoided_kg).toFixed(2)} kg</td><td>${Number(x.estimated_tree_year_equivalent).toFixed(4)} tree-year</td></tr>`).join(''):'<tr><td colspan="4">No completed eligible EV trip records yet.</td></tr>'
+    })
+  </script>
+</body>
+</html>
