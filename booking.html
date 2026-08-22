@@ -14,7 +14,7 @@
   </header>
   <main class="page-shell">
     <div class="flow-steps"><span class="active" id="flow1">1 · Trip</span><span id="flow2">2 · Fare & Availability</span><span id="flow3">3 · Customer</span><span id="flow4">4 · Confirm</span><span id="flow5">5 · Secure Payment</span></div>
-    <div class="page-title"><div><span class="eyebrow">ADVANCE MOBILITY BOOKING</span><h1>Book your HERO Move.</h1><p>Check an authoritative fare and real vehicle/driver availability before confirming. Membership remains optional.</p></div></div>
+    <div class="page-title"><div><span class="eyebrow">GREEN AIRPORT TRANSFER</span><h1>MAXUS 9 EV airport transfer.</h1><p>One-way between Suvarnabhumi (BKK) or Don Mueang (DMK) and Bangkok. Book 48 hours or more in advance for 10% off.</p></div></div>
     <form class="form-card" id="bookingForm">
       <h2 style="color:var(--navy);margin-top:0">Trip Details</h2>
       <div class="form-grid">
@@ -23,12 +23,14 @@
         <div class="field"><label for="date">Date</label><input id="date" type="date" required></div>
         <div class="field"><label for="time">Pickup Time</label><input id="time" type="time" required></div>
         <div class="field"><label for="service">Service</label><select id="service" required></select></div>
-        <div class="field"><label for="vehicleClass">Vehicle</label><select id="vehicleClass"><option>Executive EV</option><option>Premium MPV</option><option>Executive Sedan</option><option>Van</option></select></div>
+        <div class="field"><label for="vehicleClass">Vehicle</label><select id="vehicleClass"><option value="Premium MPV">MAXUS 9 EV · Premium MPV</option></select></div>
         <div class="field"><label for="passengers">Passengers</label><select id="passengers"><option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></div>
         <div class="field"><label for="luggage">Luggage</label><select id="luggage"><option>0</option><option selected>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
         <div class="field"><label for="flightNumber">Flight No. (optional)</label><input id="flightNumber" placeholder="TG 123"></div>
         <div class="field"><label for="taxInvoice">Tax Invoice</label><select id="taxInvoice"><option value="false">Not required</option><option value="true">Required</option></select></div>
+        <div class="field full"><label><input id="scopeAccepted" type="checkbox" required style="width:auto;margin-right:8px">I confirm this is a one-way BKK/DMK airport transfer to or from an address in Bangkok.</label></div>
       </div>
+      <div class="reward-note" style="margin-top:14px"><strong>Advance fare ฿2,250</strong> when booked at least 48 hours ahead · Regular fare ฿2,500 · Includes 60 minutes · Extra commenced hour ฿700 · Subject to service area and vehicle availability.</div>
       <button class="btn btn-primary" id="checkButton" type="button" style="width:100%;margin-top:18px">CHECK FARE & AVAILABILITY</button>
       <div class="booking-status" id="availabilityStatus" role="status"></div>
 
@@ -37,8 +39,10 @@
           <div class="summary-box" style="margin-top:0">
             <h3 style="margin-top:0;color:var(--navy)">Fare Summary</h3>
             <div class="summary-row"><span>Service</span><strong id="quoteService">—</strong></div>
-            <div class="summary-row"><span>Reservation deposit</span><strong id="quoteDeposit">—</strong></div>
-            <div class="summary-row"><span>Balance before service</span><strong id="quoteBalance">—</strong></div>
+            <div class="summary-row"><span>Fare type</span><strong id="quoteTier">—</strong></div>
+            <div class="summary-row"><span>Included / overtime</span><strong id="quoteIncluded">—</strong></div>
+            <div class="summary-row"><span id="paymentDueLabel">Payment due</span><strong id="quoteDeposit">—</strong></div>
+            <div class="summary-row" id="balanceRow"><span>Balance before service</span><strong id="quoteBalance">—</strong></div>
             <div class="summary-row total"><span>Total fare</span><strong id="quoteTotal">—</strong></div>
           </div>
           <div class="summary-box reward-panel" style="margin-top:0">
@@ -69,17 +73,17 @@
     }
     function markFlow(step){for(let i=1;i<=5;i++){const el=document.getElementById(`flow${i}`);el.className=i<step?'done':i===step?'active':''}}
     HM.onReady(()=>{
-      const params=new URLSearchParams(location.search),today=new Date();date.min=today.toISOString().slice(0,10);date.value=params.get('date')||date.min;time.value=params.get('time')||'09:00';pickup.value=params.get('pickup')||'';destination.value=params.get('dest1')||params.get('destination')||'';passengers.value=params.get('passengers')||'2';vehicleClass.value=params.get('vehicleClass')||'Executive EV';
+      const params=new URLSearchParams(location.search),today=new Date();date.min=today.toISOString().slice(0,10);date.value=params.get('date')||date.min;time.value=params.get('time')||'09:00';pickup.value=params.get('pickup')||'';destination.value=params.get('dest1')||params.get('destination')||'';passengers.value=params.get('passengers')||'2';vehicleClass.value='Premium MPV';
       const products=HM.bootData.serviceProducts||[];service.innerHTML=products.map(p=>`<option value="${p.code}">${p.name}</option>`).join('');if(params.get('service')){const named=products.find(p=>p.name===params.get('service')||p.code===params.get('service'));if(named)service.value=named.code}
       const member=HM.currentMember();if(member){customerName.value=member.name||'';mobile.value=member.mobile||'';email.value=member.email||'';bookingIdentity.textContent=`HERO Member · ${member.memberNumber||member.id}`}
       checkButton.addEventListener('click',async()=>{
-        if(!pickup.value||!destination.value||!date.value||!time.value){availabilityStatus.className='booking-status show error';availabilityStatus.textContent='Please complete pickup, destination, date and pickup time.';return}
-        checkButton.disabled=true;availabilityStatus.className='booking-status show warn';availabilityStatus.textContent='Checking current pricing, vehicle schedules, driver schedules and maintenance blocks…';
+        if(!pickup.value||!destination.value||!date.value||!time.value||!scopeAccepted.checked){availabilityStatus.className='booking-status show error';availabilityStatus.textContent='Complete the trip details and confirm the BKK/DMK ↔ Bangkok service area.';return}
+        checkButton.disabled=true;availabilityStatus.className='booking-status show warn';availabilityStatus.textContent='Checking the live fare and supplier-confirmation conditions…';
         try{
           const result=await HM.checkAvailability(tripInput());currentQuote=result.quote;currentAvailability=result.availability;
-          quoteService.textContent=result.quote.service.name;quoteDeposit.textContent=`${HM.money(result.quote.deposit)} (${result.quote.depositPercent}%)`;quoteBalance.textContent=HM.money(result.quote.balance);quoteTotal.textContent=HM.money(result.quote.total);
+          quoteService.textContent=result.quote.service.name;quoteTier.textContent=result.quote.pricingTier||'Current fare';quoteIncluded.textContent=`${result.quote.includedMinutes||60} min · ${HM.money(result.quote.overtimePerHour||700)} / commenced extra hour`;quoteDeposit.textContent=`${HM.money(result.quote.deposit)} (${result.quote.depositPercent}%)`;quoteBalance.textContent=HM.money(result.quote.balance);quoteTotal.textContent=HM.money(result.quote.total);paymentDueLabel.textContent=result.quote.depositPercent>=100?'Full advance payment':'Reservation deposit';balanceRow.hidden=result.quote.balance<=0;
           const credits=result.quote.creditsToEarn||0;if(member){creditHeadline.textContent=`You earn ${credits} HERO Credits`;creditMessage.textContent='Credits are awarded from the eligible final completed-trip value, not only the deposit.';membershipLink.hidden=true}else{creditHeadline.textContent=`Sign up to earn ${credits} HERO Credits`;creditMessage.textContent='Plus 200 HERO Credits Welcome Bonus. Every eligible completed THB 100 block earns 1 credit under the current rule.'}
-          availabilityStatus.className=`booking-status show ${result.availability.available?'ok':'warn'}`;availabilityStatus.textContent=result.availability.available?`${result.availability.availableVehicleCount} vehicle(s) and ${result.availability.availableDriverCount} driver(s) currently match this time window.`:'No matching vehicle/driver pair is currently free. You can still submit a pending request for operator confirmation, or adjust the date, time or vehicle class.';
+          availabilityStatus.className=`booking-status show ${result.availability.requestable?'ok':result.availability.available?'ok':'warn'}`;availabilityStatus.textContent=result.availability.confirmationRequired?(result.quote.shortNotice?'This trip can be booked now at the regular fare. HERO Move will confirm the MAXUS 9 EV and chauffeur after BM responds; off-hours confirmation may take until the next operating period.':'Advance fare applied. Your booking and payment are recorded immediately; HERO Move will send the confirmed MAXUS 9 EV and chauffeur details after BM accepts the request.'):result.availability.available?`${result.availability.availableVehicleCount} vehicle(s) and ${result.availability.availableDriverCount} driver(s) currently match this time window.`:'No matching vehicle/driver pair is currently free.';
           quoteSection.hidden=false;markFlow(3);quoteSection.scrollIntoView({behavior:'smooth',block:'start'});
         }catch(error){availabilityStatus.className='booking-status show error';availabilityStatus.textContent=error.message}finally{checkButton.disabled=false}
       });
@@ -89,7 +93,7 @@
         try{
           const result=await HM.createBooking({...tripInput(),customerName:customerName.value.trim(),mobile:mobile.value.trim(),email:email.value.trim(),notes:notes.value.trim()});
           sessionStorage.setItem('hm_checkout_context',JSON.stringify({booking:result.booking,quote:result.quote,payment:result.payment,createdAt:new Date().toISOString()}));
-          quoteSection.hidden=true;confirmationBox.classList.add('show');confirmationBox.innerHTML=`<strong>Booking request confirmed</strong><br><br>Booking: <b>${result.booking.bookingNumber||result.booking.id}</b><br>Total: <b>${HM.money(result.quote.total)}</b><br>Reservation deposit: <b>${HM.money(result.quote.deposit)}</b><br>Status: <b>${result.booking.status}</b><br><br><div class="hero-actions"><a class="btn btn-primary" href="payment.html">Continue to Secure Payment</a><a class="btn btn-outline" href="customer-portal.html">Customer Portal</a><a class="btn btn-outline" href="index.html">Home</a></div>`;markFlow(5);confirmationBox.scrollIntoView({behavior:'smooth'});
+          quoteSection.hidden=true;confirmationBox.classList.add('show');confirmationBox.innerHTML=`<strong>Booking request received</strong><br><br>Booking: <b>${result.booking.bookingNumber||result.booking.id}</b><br>Total: <b>${HM.money(result.quote.total)}</b><br>Payment due: <b>${HM.money(result.quote.deposit)}</b><br>Status: <b>${result.booking.status}</b><br><br>After payment is recorded, HERO Move will secure the trip with BM and send the vehicle plate and chauffeur details when released.<br><br><div class="hero-actions"><a class="btn btn-primary" href="payment.html">Continue to Secure Payment</a><a class="btn btn-outline" href="customer-portal.html">Customer Portal</a><a class="btn btn-outline" href="index.html">Home</a></div>`;markFlow(5);confirmationBox.scrollIntoView({behavior:'smooth'});
         }catch(error){availabilityStatus.className='booking-status show error';availabilityStatus.textContent=error.message;markFlow(3)}finally{confirmButton.disabled=false;confirmButton.textContent='CONFIRM BOOKING'}
       })
     })

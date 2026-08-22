@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Supplier Operations | HERO Move</title>
+  <meta name="description" content="Secure HERO Move operator workflow for external mobility supplier booking confirmation, trip details and settlement.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="production.css">
+</head>
+<body data-requires-role="owner,admin,operator,dispatcher,finance">
+  <header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">HM</span><strong>HERO <em>Move</em></strong></a><div class="top-actions"><a class="btn btn-primary small-btn" href="booking.html">New Booking</a></div></header>
+  <main class="page-shell">
+    <div class="tabs"><a href="admin.html">Dashboard</a><a href="dispatch.html">Dispatch</a><a class="active" href="supplier-operations.html">Supplier Operations</a><a href="payment.html">Payments</a><a href="settings.html">Owner Settings</a></div>
+    <div class="page-title"><div><span class="eyebrow">LEVEL 1 OPERATIONS</span><h1>HERO Move → Borrow Mobility</h1><p>HERO Move owns the customer booking. Paid requests are sent to BM, then the operator records supplier acceptance and releases the assigned MAXUS 9 EV and chauffeur details to the customer.</p></div></div>
+    <div class="service-alert" style="position:static;margin:0 0 18px"><strong>Connected Payments not yet activated</strong><span>Use “Record payment received” only after HERO Move has verified the customer’s payment externally. Supplier messages are queued in the notification outbox until LINE, email or SMS credentials are connected.</span></div>
+    <section class="dashboard-grid">
+      <div class="stat"><small>Awaiting Payment</small><strong id="awaitingPayment">0</strong></div>
+      <div class="stat"><small>Send / Await BM</small><strong id="awaitingSupplier">0</strong></div>
+      <div class="stat"><small>Details Pending</small><strong id="detailsPending">0</strong></div>
+      <div class="stat"><small>Ready</small><strong id="readyCount">0</strong></div>
+      <div class="stat"><small>Supplier Payables</small><strong id="payableTotal">฿0</strong></div>
+      <div class="stat"><small>Queued Notices</small><strong id="noticeCount">0</strong></div>
+    </section>
+    <section class="table-card" style="margin-top:18px">
+      <h2>BM booking workflow</h2>
+      <div style="overflow:auto"><table><thead><tr><th>Booking</th><th>Trip</th><th>Customer</th><th>Fare / Payment</th><th>BM Cost / Margin</th><th>Supplier Status</th><th>Action</th></tr></thead><tbody id="supplierRows"></tbody></table></div>
+    </section>
+    <section id="actionPanel" class="form-card" style="margin-top:18px" hidden>
+      <span class="eyebrow">SELECTED BOOKING</span><h2 id="actionTitle">Supplier action</h2><p id="actionSummary"></p>
+      <div class="form-grid">
+        <div class="field"><label for="supplierReference">BM reference</label><input id="supplierReference" placeholder="BM booking/reference number"></div>
+        <div class="field"><label for="vehiclePlate">Vehicle plate</label><input id="vehiclePlate" placeholder="Registration plate"></div>
+        <div class="field"><label for="vehicleModel">Vehicle</label><input id="vehicleModel" value="MAXUS 9 EV"></div>
+        <div class="field"><label for="driverName">Chauffeur name</label><input id="driverName" placeholder="Full name"></div>
+        <div class="field"><label for="driverMobile">Chauffeur mobile</label><input id="driverMobile" placeholder="Telephone number"></div>
+        <div class="field"><label for="actualMinutes">Actual service minutes</label><input id="actualMinutes" type="number" min="1" value="60"></div>
+        <div class="field full"><label for="operatorNotes">Operations note</label><textarea id="operatorNotes" rows="3" placeholder="Supplier confirmation, exception or completion note"></textarea></div>
+      </div>
+      <div class="hero-actions" style="margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-primary" id="recordPayment" type="button">Record payment received</button>
+        <button class="btn btn-navy" id="sendBm" type="button">Send request to BM</button>
+        <button class="btn btn-primary" id="acceptBm" type="button">Record BM accepted</button>
+        <button class="btn btn-outline" id="declineBm" type="button">Record BM declined</button>
+        <button class="btn btn-navy" id="saveDetails" type="button">Send vehicle & chauffeur details</button>
+        <button class="btn btn-outline" id="driverComplete" type="button">Driver trip complete</button>
+        <button class="btn btn-primary" id="verifyTrip" type="button">Verify trip & supplier cost</button>
+      </div>
+      <div class="booking-status" id="actionStatus" role="status"></div>
+    </section>
+    <section class="grid-two" style="margin-top:18px">
+      <div class="table-card"><h2>Supplier payable ledger</h2><table><thead><tr><th>Booking</th><th>Supplier</th><th>Amount</th><th>Status</th></tr></thead><tbody id="payableRows"></tbody></table></div>
+      <div class="table-card"><h2>Notification outbox</h2><table><thead><tr><th>Channel</th><th>Subject</th><th>Status</th></tr></thead><tbody id="noticeRows"></tbody></table></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    let activeBooking=null,activeAssignment=null;
+    const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const raw=s=>String(s||'').toLowerCase();
+    function paymentFor(booking){return HM.get(HM.key.payments).find(p=>p.booking_id===booking.id||p.bookingId===booking.id)}
+    function marginFor(booking,assignment){const cost=Number(assignment?.final_supplier_cost??assignment?.estimated_supplier_cost??0);return Number(booking.price||0)-cost}
+    function render(){
+      const bookings=HM.get(HM.key.bookings),assignments=HM.get(HM.key.supplierAssignments),payables=HM.get(HM.key.supplierPayables),notices=HM.get(HM.key.notifications);
+      const supplierBookings=bookings.filter(b=>b.confirmationMode==='supplier_manual'||assignments.some(a=>a.booking_id===b.id));
+      awaitingPayment.textContent=supplierBookings.filter(b=>!['paid','deposit_paid'].includes(raw(b.paymentStatus).replaceAll(' ','_'))).length;
+      awaitingSupplier.textContent=assignments.filter(a=>['request_pending','sent_to_supplier','supplier_declined'].includes(a.status)).length;
+      detailsPending.textContent=assignments.filter(a=>['supplier_accepted','details_pending'].includes(a.status)).length;
+      readyCount.textContent=assignments.filter(a=>a.status==='ready').length;
+      payableTotal.textContent=HM.money(payables.filter(p=>!['paid','cancelled'].includes(p.status)).reduce((sum,p)=>sum+Number(p.amount||0),0));
+      noticeCount.textContent=notices.filter(n=>['queued','pending'].includes(n.status||'queued')).length;
+      supplierRows.innerHTML=supplierBookings.length?supplierBookings.map(b=>{const a=assignments.find(x=>x.booking_id===b.id),cost=Number(a?.final_supplier_cost??a?.estimated_supplier_cost??0),margin=marginFor(b,a);return `<tr><td><button class="btn btn-outline small-btn" data-open="${esc(b.id)}">${esc(b.bookingNumber||b.id)}</button><br><small>${esc(b.status)}</small></td><td>${esc(b.date)} ${esc(b.time)}<br><small>${esc(b.pickup)} → ${esc(b.dest1)}</small></td><td>${esc(b.customer)}<br><small>${esc(b.mobile)}</small></td><td>${HM.money(b.price)}<br><span class="badge ${raw(b.paymentStatus)==='paid'?'green':'orange'}">${esc(b.paymentStatus)}</span></td><td>${cost?`${HM.money(cost)}<br><small>Est. margin ${HM.money(margin)}</small>`:'—'}</td><td><span class="badge ${a?.status==='ready'||a?.status==='supplier_verified'?'green':'orange'}">${esc((a?.status||'not assigned').replaceAll('_',' '))}</span></td><td><button class="btn btn-navy small-btn" data-open="${esc(b.id)}">Manage</button></td></tr>`}).join(''):'<tr><td colspan="7">No supplier bookings yet.</td></tr>';
+      payableRows.innerHTML=payables.length?payables.map(p=>`<tr><td>${esc(p.bookings?.booking_number||p.booking_id)}</td><td>${esc(p.mobility_suppliers?.display_name||'BM')}</td><td>${HM.money(p.amount)}</td><td><span class="badge orange">${esc(p.status)}</span></td></tr>`).join(''):'<tr><td colspan="4">No supplier payables yet.</td></tr>';
+      noticeRows.innerHTML=notices.length?notices.slice(0,20).map(n=>`<tr><td>${esc(n.channel)}</td><td>${esc(n.subject)}</td><td><span class="badge ${n.status==='sent'?'green':'orange'}">${esc(n.status||'queued')}</span></td></tr>`).join(''):'<tr><td colspan="3">No queued notices.</td></tr>';
+      document.querySelectorAll('[data-open]').forEach(button=>button.addEventListener('click',()=>openBooking(button.dataset.open)));
+    }
+    function openBooking(id){activeBooking=HM.get(HM.key.bookings).find(b=>b.id===id);activeAssignment=HM.get(HM.key.supplierAssignments).find(a=>a.booking_id===id);if(!activeBooking)return;actionPanel.hidden=false;actionTitle.textContent=activeBooking.bookingNumber||activeBooking.id;actionSummary.textContent=`${activeBooking.date} ${activeBooking.time} · ${activeBooking.pickup} → ${activeBooking.dest1} · ${activeBooking.status}`;supplierReference.value=activeAssignment?.supplier_reference||'';vehiclePlate.value=activeAssignment?.vehicle_plate||'';vehicleModel.value=activeAssignment?.vehicle_model||'MAXUS 9 EV';driverName.value=activeAssignment?.driver_name||'';driverMobile.value=activeAssignment?.driver_mobile||'';actualMinutes.value=activeAssignment?.actual_service_minutes||60;operatorNotes.value=activeAssignment?.supplier_notes||'';actionPanel.scrollIntoView({behavior:'smooth'})}
+    async function run(label,operation){if(!activeBooking)return;actionStatus.className='booking-status show warn';actionStatus.textContent=`${label}…`;document.querySelectorAll('#actionPanel button').forEach(b=>b.disabled=true);try{const result=await operation();actionStatus.className='booking-status show ok';actionStatus.textContent=`${label} completed.`;await HM.refresh();render();openBooking(activeBooking.id);return result}catch(error){actionStatus.className='booking-status show error';actionStatus.textContent=error.message}finally{document.querySelectorAll('#actionPanel button').forEach(b=>b.disabled=false)}}
+    HM.onReady(()=>{
+      render();
+      recordPayment.onclick=()=>run('Recording verified payment',async()=>{const payment=paymentFor(activeBooking);if(!payment)throw new Error('No payment record exists for this booking');return HM.updatePaymentStatus({paymentId:payment.id,status:'paid',method:'other',responseSummary:{recordedByOperator:true,methodLabel:'Manual transfer'}})});
+      sendBm.onclick=()=>run('Sending request to BM',()=>HM.sendToSupplier({bookingId:activeBooking.id,notes:operatorNotes.value}));
+      acceptBm.onclick=()=>run('Recording BM acceptance',()=>HM.confirmSupplierBooking({bookingId:activeBooking.id,accepted:true,supplierReference:supplierReference.value,notes:operatorNotes.value}));
+      declineBm.onclick=()=>run('Recording BM decline',()=>HM.confirmSupplierBooking({bookingId:activeBooking.id,accepted:false,notes:operatorNotes.value}));
+      saveDetails.onclick=()=>run('Releasing vehicle and chauffeur details',()=>HM.recordSupplierDetails({bookingId:activeBooking.id,supplierReference:supplierReference.value,vehiclePlate:vehiclePlate.value,vehicleBrand:'MG',vehicleModel:vehicleModel.value,driverName:driverName.value,driverMobile:driverMobile.value,notes:operatorNotes.value}));
+      driverComplete.onclick=()=>run('Recording driver trip completion',()=>HM.updateTripStatus({bookingId:activeBooking.id,status:'completed_by_driver',notes:operatorNotes.value}));
+      verifyTrip.onclick=()=>run('Verifying supplier trip',result=>HM.verifySupplierCompletion({bookingId:activeBooking.id,actualServiceMinutes:Number(actualMinutes.value),notes:operatorNotes.value}));
+    });
+  </script>
+</body>
+</html>

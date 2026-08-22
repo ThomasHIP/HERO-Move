@@ -4,7 +4,7 @@ const HM={
     publishableKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh1eWdwZnN3cGltaHR2dG1vbGpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3NDExMzEsImV4cCI6MjA2OTMxNzEzMX0.1Vr4IfsNyr2JrInzkBqFuDeTV2VRB8a3EJn75YzliQA',
     operatorSlug:'hero-move'
   },
-  key:{lang:'hm_lang',vehicles:'hm_vehicles',bookings:'hm_bookings',maintenance:'hm_maintenance',drivers:'hm_drivers',customers:'hm_customers',members:'hm_members',session:'hm_session',credits:'hm_credits',creditLedger:'hm_credits',invoices:'hm_invoices',pricing:'hm_pricing',settings:'hm_settings',payments:'hm_payments',rewards:'hm_rewards',auth:'hm_auth_session'},
+  key:{lang:'hm_lang',vehicles:'hm_vehicles',bookings:'hm_bookings',maintenance:'hm_maintenance',drivers:'hm_drivers',customers:'hm_customers',members:'hm_members',session:'hm_session',credits:'hm_credits',creditLedger:'hm_credits',invoices:'hm_invoices',pricing:'hm_pricing',settings:'hm_settings',payments:'hm_payments',rewards:'hm_rewards',suppliers:'hm_suppliers',supplierAssignments:'hm_supplier_assignments',supplierPayables:'hm_supplier_payables',notifications:'hm_notifications',auth:'hm_auth_session'},
   state:new Map(),
   bootData:null,
   bootPromise:null,
@@ -60,7 +60,7 @@ const HM={
   },
   mapBootstrap(data){
     this.bootData=data;
-    const pairs=[[this.key.vehicles,data.vehicles],[this.key.bookings,data.bookings],[this.key.maintenance,data.maintenance],[this.key.drivers,data.drivers],[this.key.customers,data.customers],[this.key.members,data.members],[this.key.credits,data.credits],[this.key.invoices,data.invoices],[this.key.pricing,data.pricing],[this.key.settings,data.settings],[this.key.payments,data.payments],[this.key.rewards,data.rewards]];
+    const pairs=[[this.key.vehicles,data.vehicles],[this.key.bookings,data.bookings],[this.key.maintenance,data.maintenance],[this.key.drivers,data.drivers],[this.key.customers,data.customers],[this.key.members,data.members],[this.key.credits,data.credits],[this.key.invoices,data.invoices],[this.key.pricing,data.pricing],[this.key.settings,data.settings],[this.key.payments,data.payments],[this.key.rewards,data.rewards],[this.key.suppliers,data.suppliers],[this.key.supplierAssignments,data.supplierAssignments],[this.key.supplierPayables,data.supplierPayables],[this.key.notifications,data.notifications]];
     pairs.forEach(([key,value])=>this.state.set(key,value??(key===this.key.settings?{}:[])));
     return data
   },
@@ -100,6 +100,10 @@ const HM={
   saveServiceProduct(values){return this.api('save_service_product',values)},
   saveProfileItem(values){return this.api('save_profile_item',values)},
   updatePaymentStatus(values){return this.api('update_payment_status',values)},
+  sendToSupplier(values){return this.api('send_to_supplier',values)},
+  confirmSupplierBooking(values){return this.api('confirm_supplier_booking',values)},
+  recordSupplierDetails(values){return this.api('record_supplier_details',values)},
+  verifySupplierCompletion(values){return this.api('verify_supplier_completion',values)},
   createInvoice(values){return this.api('create_invoice',values)},
   generateEsgTrip(values){return this.api('generate_esg_trip',values)},
   demoQuote(input){const p=this.get(this.key.pricing).find(x=>x.serviceCode===input.serviceCode||x.service===input.service)||this.get(this.key.pricing)[0],total=Number(p?.price||1200),deposit=total*Number(p?.depositPct||10)/100;return Promise.resolve({service:{id:'demo-service-1',name:p?.service||'Airport Transfer',code:p?.serviceCode||'airport_transfer',default_duration_minutes:120},total,subtotal:total,depositPercent:p?.depositPct||10,deposit,balance:total-deposit,creditsToEarn:Math.floor(total/100),payment:this.bootData.paymentSettings})},
