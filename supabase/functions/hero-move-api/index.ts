@@ -465,6 +465,19 @@ async function awardCredit(operatorId: string, memberId: string, tier: number, a
   return credits;
 }
 
+async function awardCompletedBookingRewards(operatorId: string, booking: Json, actor: Actor) {
+  let rideCredits = 0, referralCredits = 0;
+  if (booking.member_id) rideCredits = await awardCredit(operatorId, String(booking.member_id), 1, Number(booking.total_amount), String(booking.id), "ride_earn", "Ride & Earn — completed HERO Move trip", actor);
+  if (booking.member_id) {
+    const { data: referral } = await admin.from("referrals").select("*").eq("operator_id", operatorId).eq("referred_member_id", booking.member_id).in("status", ["pending", "qualified", "rewarded"]).maybeSingle();
+    if (referral) {
+      referralCredits = await awardCredit(operatorId, referral.referrer_member_id, 2, Number(booking.total_amount), String(booking.id), "referral_earn", "Refer & Earn — eligible referred-customer trip", actor);
+      await admin.from("referrals").update({ status: "rewarded", qualified_at: referral.qualified_at ?? new Date().toISOString() }).eq("id", referral.id);
+    }
+  }
+  return { rideCredits, referralCredits };
+}
+
 async function updateTripStatus(actor: Actor, operatorId: string, input: Json) {
   requireUser(actor);
   const status = String(input.status).toLowerCase().replaceAll(" ", "_");
@@ -485,14 +498,7 @@ async function updateTripStatus(actor: Actor, operatorId: string, input: Json) {
   if (status === "completed_by_driver") await admin.from("booking_supplier_assignments").update({ status: "driver_completed", driver_completed_at: new Date().toISOString() }).eq("operator_id", operatorId).eq("booking_id", booking.id);
   let rideCredits = 0, referralCredits = 0, esg = null;
   if (status === "completed") {
-    if (booking.member_id) rideCredits = await awardCredit(operatorId, booking.member_id, 1, Number(booking.total_amount), booking.id, "ride_earn", "Ride & Earn — completed HERO Move trip", actor);
-    if (booking.member_id) {
-      const { data: referral } = await admin.from("referrals").select("*").eq("operator_id", operatorId).eq("referred_member_id", booking.member_id).in("status", ["pending", "qualified", "rewarded"]).maybeSingle();
-      if (referral) {
-        referralCredits = await awardCredit(operatorId, referral.referrer_member_id, 2, Number(booking.total_amount), booking.id, "referral_earn", "Refer & Earn — eligible referred-customer trip", actor);
-        await admin.from("referrals").update({ status: "rewarded", qualified_at: new Date().toISOString() }).eq("id", referral.id);
-      }
-    }
+    ({ rideCredits, referralCredits } = await awardCompletedBookingRewards(operatorId, booking, actor));
     const energy = (booking.vehicles as Json | null)?.energy_type;
     const distance = Math.max(0, Number(input.distanceKm ?? 0));
     if ((energy === "ev" || energy === "phev") && distance > 0) {
@@ -697,9 +703,13 @@ async function verifySupplierCompletion(actor: Actor, operatorId: string, input:
   const finalStatus = amountDue > 0 ? "supplier_verified" : "completed";
   await admin.from("bookings").update({ status: finalStatus, subtotal: customerFinalTotal, total_amount: customerFinalTotal, balance_amount: amountDue }).eq("id", booking.id);
   await admin.from("trip_status_history").insert({ operator_id: operatorId, booking_id: booking.id, from_status: booking.status, to_status: finalStatus, changed_by: actor.userId, notes: `Supplier verified ${minutes} minutes; customer overtime ${overtimeHours} hour(s)` });
-  if (finalStatus === "completed") await queueGuestNotification(operatorId, booking, "trip_completed", "Thank you for riding with HERO Move", `Booking ${booking.booking_number} is complete. Thank you for choosing a greener, more comfortable airport journey.`, { actualServiceMinutes: minutes, customerFinalTotal });
+  let rewards = { rideCredits: 0, referralCredits: 0 };
+  if (finalStatus === "completed") {
+    rewards = await awardCompletedBookingRewards(operatorId, { ...booking, total_amount: customerFinalTotal }, actor);
+    await queueGuestNotification(operatorId, booking, "trip_completed", "Thank you for riding with HERO Move", `Booking ${booking.booking_number} is complete. Thank you for choosing a greener, more comfortable airport journey.`, { actualServiceMinutes: minutes, customerFinalTotal, ...rewards });
+  }
   await audit(actor, "supplier.trip_verified", "booking_supplier_assignment", assignment.id, { bookingId: booking.id, minutes, finalSupplierCost, customerFinalTotal, amountDue });
-  return { assignment: updated, finalSupplierCost, customerFinalTotal, overtimeHours, amountDue, estimatedGrossMargin: customerFinalTotal - finalSupplierCost, bookingStatus: finalStatus };
+  return { assignment: updated, finalSupplierCost, customerFinalTotal, overtimeHours, amountDue, estimatedGrossMargin: customerFinalTotal - finalSupplierCost, bookingStatus: finalStatus, ...rewards };
 }
 
 async function updatePaymentStatus(actor: Actor, operatorId: string, input: Json) {
@@ -727,6 +737,12 @@ async function updatePaymentStatus(actor: Actor, operatorId: string, input: Json
         await admin.from("bookings").update({ status: "pending_supplier_confirmation" }).eq("id", booking.id);
         await admin.from("trip_status_history").insert({ operator_id: operatorId, booking_id: booking.id, from_status: booking.status, to_status: "pending_supplier_confirmation", changed_by: actor.userId, notes: `Payment recorded; request queued for ${supplier.display_name}` });
         await queueSupplierNotification(operatorId, booking, supplier, "supplier_booking_request", `Paid HERO Move request ${booking.booking_number}`, `${booking.pickup_at}; ${booking.pickup_address} to ${booking.destination_address}; ${booking.passenger_count} passenger(s); ${booking.vehicle_class}.`, { assignmentId: assignment.id, requestedAt: now, paid: true });
+      }
+      if (booking.status === "supplier_verified" && bookingPaymentStatus === "paid") {
+        const rewards = await awardCompletedBookingRewards(operatorId, booking, actor);
+        await admin.from("bookings").update({ status: "completed", balance_amount: 0 }).eq("id", booking.id);
+        await admin.from("trip_status_history").insert({ operator_id: operatorId, booking_id: booking.id, from_status: "supplier_verified", to_status: "completed", changed_by: actor.userId, notes: "Final trip adjustment paid" });
+        await queueGuestNotification(operatorId, booking, "trip_completed", "Thank you for riding with HERO Move", `Booking ${booking.booking_number} is complete. Thank you for choosing HERO Move.`, rewards);
       }
     }
   }
